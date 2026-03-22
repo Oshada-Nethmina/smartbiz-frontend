@@ -2,14 +2,14 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import SideBar from './components/Sidebar/SideBar.jsx'
+import Header from './components/Header/Header.jsx'
 
 function App() {
-  
+
 
   return (
     <>
-      <SideBar />
+      <Header title="Dashboard" subtitle="Welcome to SmartBiz" />
     </>
   )
 }
