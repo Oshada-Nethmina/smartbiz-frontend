@@ -3,33 +3,33 @@ import { useLocation } from 'react-router-dom'
 import { Box, Typography, Stack, Chip, IconButton, Tooltip, alpha } from '@mui/material'
 import { Notifications, LightMode } from '@mui/icons-material'
 import { useBusiness } from '@/context/BusinessContext'
-import { useAuth }     from '@/context/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 
 const PAGE_TITLES = {
-  '/dashboard':          'Dashboard',
-  '/sales':              'Sales',
-  '/invoices':           'Invoices',
-  '/customers':          'Customers',
-  '/suppliers':          'Suppliers',
-  '/products':           'Products & Inventory',
-  '/expenses':           'Expenses',
-  '/reports':            'Reports & Analytics',
-  '/ai':                 'AI Assistant',
-  '/subscription':       'Subscription',
-  '/admin':              'Admin Panel',
-  '/admin/businesses':   'All Businesses',
-  '/admin/users':        'All Users',
+    '/dashboard': 'Dashboard',
+    '/sales': 'Sales',
+    '/invoices': 'Invoices',
+    '/customers': 'Customers',
+    '/suppliers': 'Suppliers',
+    '/products': 'Products & Inventory',
+    '/expenses': 'Expenses',
+    '/reports': 'Reports & Analytics',
+    '/ai': 'AI Assistant',
+    '/subscription': 'Subscription',
+    '/admin': 'Admin Panel',
+    '/admin/businesses': 'All Businesses',
+    '/admin/users': 'All Users',
 }
 
 
 export default function MainLayout({ children }) {
     const { pathname } = useLocation()
-  const { business } = useBusiness()
-  const { user }     = useAuth()
+    const { business } = useBusiness()
+    const { user } = useAuth()
 
-  const base  = '/' + pathname.split('/')[1]
-  const title = PAGE_TITLES[pathname] || PAGE_TITLES[base] || 'SmartBiz'
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const base = '/' + pathname.split('/')[1]
+    const title = PAGE_TITLES[pathname] || PAGE_TITLES[base] || 'SmartBiz'
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
     return (
         <Box
             component="header"
