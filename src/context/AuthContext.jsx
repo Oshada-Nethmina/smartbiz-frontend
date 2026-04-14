@@ -4,11 +4,11 @@ import { authService } from '@/services'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user,    setUser]    = useState(null)
+  const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const storedUser  = localStorage.getItem('sb_user')
+    const storedUser = localStorage.getItem('sb_user')
     const storedToken = localStorage.getItem('sb_token')
     if (storedUser && storedToken) setUser(JSON.parse(storedUser))
     setLoading(false)
@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     const res = await authService.login(email, password)
     const { token, user: u } = res.data
     localStorage.setItem('sb_token', token)
-    localStorage.setItem('sb_user',  JSON.stringify(u))
+    localStorage.setItem('sb_user', JSON.stringify(u))
     setUser(u)
     return u
   }
@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
     const res = await authService.register(data)
     const { token, user: u } = res.data
     localStorage.setItem('sb_token', token)
-    localStorage.setItem('sb_user',  JSON.stringify(u))
+    localStorage.setItem('sb_user', JSON.stringify(u))
     setUser(u)
     return u
   }
@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const isAdmin         = ()  => user?.role === 'ADMIN'
-  const isAuthenticated = ()  => !!user
+  const isAdmin = () => user?.role === 'ADMIN'
+  const isAuthenticated = () => !!user
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout, isAdmin, isAuthenticated }}>
