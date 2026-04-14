@@ -6,8 +6,8 @@ const BusinessContext = createContext(null)
 
 export function BusinessProvider({ children }) {
   const { user, isAuthenticated } = useAuth()
-  const [business, setBusiness]   = useState(null)
-  const [loading,  setLoading]    = useState(false)
+  const [business, setBusiness] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated() && user?.businessId) fetchBusiness(user.businessId)
