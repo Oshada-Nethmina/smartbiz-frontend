@@ -1,9 +1,9 @@
 import api from './api'
 
 export const authService = {
-    login: (email, password) => api.post('/auth/v1/login', { email, password }),
-    register: (data) => api.post('/auth/v1/register', data),
-    me: () => api.get('/auth/me'),
+    login: (email, password) => api.post('/v1/auth/login', { email, password }),
+    register: (data) => api.post('/v1/auth/register', data),
+    me: () => api.get('/v1/auth/me'),
 }
 
 export const businessService = {
@@ -23,11 +23,11 @@ export const customerService = {
 }
 
 export const supplierService = {
-    getAll: (bId) => api.get(`/suppliers?businessId=${bId}`),
-    getById: (id) => api.get(`/suppliers/${id}`),
-    create: (data) => api.post('/suppliers', data),
-    update: (id, data) => api.put(`/suppliers/${id}`, data),
-    delete: (id) => api.delete(`/suppliers/${id}`),
+    getAll: () => api.get('/supplier/getAll'),
+    getById: (id) => api.get(`/supplier/search/${id}`),
+    create: (data) => api.post('/supplier/save', data),
+    update: (id, data) => api.put(`/supplier/update/${id}`, data),
+    delete: (id) => api.delete(`/supplier/delete/${id}`),
 }
 
 export const productService = {
