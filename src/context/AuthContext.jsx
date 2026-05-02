@@ -7,27 +7,60 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // ✅ FIXED: safe localStorage parsing
   useEffect(() => {
-    const storedUser = localStorage.getItem('sb_user')
-    const storedToken = localStorage.getItem('sb_token')
-    if (storedUser && storedToken) setUser(JSON.parse(storedUser))
+    try {
+      const storedUser = localStorage.getItem('sb_user')
+      const storedToken = localStorage.getItem('sb_token')
+
+      if (
+        storedUser &&
+        storedUser !== "undefined" &&
+        storedToken
+      ) {
+        setUser(JSON.parse(storedUser))
+      } else {
+        setUser(null)
+      }
+    } catch (err) {
+      console.error("Auth parse error:", err)
+      localStorage.removeItem('sb_user')
+      setUser(null)
+    }
+
     setLoading(false)
   }, [])
 
+  // ✅ FIXED: trim inputs
   const login = async (email, password) => {
     const res = await authService.login(email, password)
-    const { token, user: u } = res.data
+
+    console.log("API RESPONSE:", res.data)
+
+    const token = res.data.token
+
+    // ✅ handle both structures
+    const user = res.data.user || res.data
+
+    if (!token || !user) {
+      throw new Error("Invalid server response")
+    }
+
     localStorage.setItem('sb_token', token)
-    localStorage.setItem('sb_user', JSON.stringify(u))
-    setUser(u)
-    return u
+    localStorage.setItem('sb_user', JSON.stringify(user))
+
+    setUser(user)
+    return user
   }
 
   const register = async (data) => {
     const res = await authService.register(data)
+
     const { token, user: u } = res.data
+
     localStorage.setItem('sb_token', token)
     localStorage.setItem('sb_user', JSON.stringify(u))
+
     setUser(u)
     return u
   }
@@ -42,7 +75,9 @@ export function AuthProvider({ children }) {
   const isAuthenticated = () => !!user
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAdmin, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, isAdmin, isAuthenticated }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   )
