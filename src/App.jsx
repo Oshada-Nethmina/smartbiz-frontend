@@ -2,8 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 // Layouts
-import MainLayout from '@/components/layout/MainLayout'
-import AuthLayout from '@/components/layout/AuthLayout'
+import MainLayout from '@/components/layouts/MainLayout'
+import AuthLayout from '@/components/layouts/AuthLayout'
 
 // Guards
 import PrivateRoute from '@/components/common/PrivateRoute'
@@ -46,7 +46,7 @@ import ExpenseForm from '@/pages/expenses/ExpenseForm'
 import Reports from '@/pages/reports/Reports'
 
 // AI
-import AIAssistant from '@/pages/ai/AIAssistant'
+// import AIAssistant from '@/pages/ai/AIAssistant'
 
 // Subscription
 import Subscription from '@/pages/subscription/Subscription'
@@ -102,7 +102,7 @@ export default function App() {
               <Route path="/expenses/new" element={<ExpenseForm />} />
 
               <Route path="/reports" element={<Reports />} />
-              <Route path="/ai" element={<AIAssistant />} />
+              {/* <Route path="/ai" element={<AIAssistant />} /> */}
               <Route path="/subscription" element={<Subscription />} />
             </Route>
 
