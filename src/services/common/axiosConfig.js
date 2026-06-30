@@ -17,7 +17,12 @@ api.interceptors.request.use(
 )
 
 api.interceptors.response.use(
-    (res) => res,
+    (res) => {
+        if (res.data && res.data.hasOwnProperty('data') && (res.data.hasOwnProperty('statusCode') || res.data.hasOwnProperty('message'))) {
+            res.data = res.data.data
+        }
+        return res
+    },
     (err) => {
         const status = err.response?.status
         const message = err.response?.data?.message || 'Something went wrong'

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, TextField, InputAdornment, Stack, IconButton, Tooltip } from '@mui/material'
+import { Box, Button, TextField, InputAdornment, Stack, IconButton, Tooltip, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { Add, Search, Edit, Delete, Visibility } from '@mui/icons-material'
 import { customerService } from '@/services'
 import { useBusiness } from '@/context/BusinessContext'
 import { PageHeader, DataTable, StatusChip, SectionCard, ConfirmDialog } from '@/components/common/UI'
+import CustomerForm from './CustomerForm'
+import CustomerDetail from './CustomerDetail'
 import toast from 'react-hot-toast'
 
 export default function CustomerList() {
@@ -15,9 +17,19 @@ export default function CustomerList() {
     const [search, setSearch] = useState('')
     const [deleteId, setDeleteId] = useState(null)
     const [deleting, setDeleting] = useState(false)
+    const [isFormOpen, setIsFormOpen] = useState(false)
+    const [editId, setEditId] = useState(null)
+    const [viewId, setViewId] = useState(null)
+
+    const fetchCustomers = () => {
+        if (business?.id) {
+            setLoading(true)
+            customerService.getAll(business.id).then(r => setCustomers(r.data)).finally(() => setLoading(false))
+        }
+    }
 
     useEffect(() => {
-        if (business?.id) customerService.getAll(business.id).then(r => setCustomers(r.data)).finally(() => setLoading(false))
+        fetchCustomers()
     }, [business])
 
     const handleDelete = async () => {
@@ -43,8 +55,14 @@ export default function CustomerList() {
             key: 'actions', label: '', width: 120,
             render: (_, row) => (
                 <Stack direction="row" spacing={0.5}>
-                    <Tooltip title="View"><IconButton size="small" onClick={() => navigate(`/customers/${row.id}`)}><Visibility fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Edit"><IconButton size="small" onClick={() => navigate(`/customers/${row.id}/edit`)}><Edit fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="View"><IconButton size="small" onClick={() => setViewId(row.id)}><Visibility fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Edit"><IconButton size="small" onClick={() => {
+                        console.log("Row =", row);
+                        console.log("Row ID =", row.id);
+                        console.log("Customer ID =", row.customerId);
+
+                        setEditId(row.id);
+                    }}><Edit fontSize="small" /></IconButton></Tooltip>
                     <Tooltip title="Delete"><IconButton size="small" color="error" onClick={() => setDeleteId(row.id)}><Delete fontSize="small" /></IconButton></Tooltip>
                 </Stack>
             ),
@@ -56,7 +74,7 @@ export default function CustomerList() {
             <PageHeader
                 title="Customers"
                 subtitle={`${customers.length} customers registered`}
-                action={<Button variant="contained" startIcon={<Add />} onClick={() => navigate('/customers/new')}>Add Customer</Button>}
+                action={<Button variant="contained" startIcon={<Add />} onClick={() => setIsFormOpen(true)}>Add Customer</Button>}
             />
             <SectionCard>
                 <Box sx={{ mb: 2 }}>
@@ -80,6 +98,34 @@ export default function CustomerList() {
                 onCancel={() => setDeleteId(null)}
                 loading={deleting}
             />
+
+            <Dialog open={isFormOpen || !!editId} onClose={() => { setIsFormOpen(false); setEditId(null) }} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>{editId ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+                <DialogContent dividers>
+                    <CustomerForm
+                        customerId={editId}
+                        onClose={() => { setIsFormOpen(false); setEditId(null) }}
+                        onSuccess={() => {
+                            setIsFormOpen(false)
+                            setEditId(null)
+                            fetchCustomers()
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={!!viewId} onClose={() => setViewId(null)} maxWidth="sm" fullWidth>
+                <DialogContent dividers sx={{ p: 0, '& .MuiBox-root': { maxWidth: '100%' } }}>
+                    <CustomerDetail
+                        customerId={viewId}
+                        onClose={() => setViewId(null)}
+                        onEdit={(id) => {
+                            setViewId(null)
+                            setEditId(id)
+                        }}
+                    />
+                </DialogContent>
+            </Dialog>
         </Box>
     )
 }

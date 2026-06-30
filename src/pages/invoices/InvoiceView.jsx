@@ -78,14 +78,14 @@ export default function InvoiceView() {
 
                 {/* Bill to / Invoice details */}
                 <Grid container spacing={3} mb={4}>
-                    <Grid item xs={6}>
+                    <Grid size={{ xs:6 }}>
                         <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text.disabled', display: 'block', mb: 0.5 }}>
                             Bill To
                         </Typography>
                         <Typography variant="body1" fontWeight={700}>{invoice.customerName || 'Walk-in Customer'}</Typography>
                         {invoice.customerEmail && <Typography variant="body2" color="text.secondary">{invoice.customerEmail}</Typography>}
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid size={{ xs:6 }}>
                         <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text.disabled', display: 'block', mb: 0.5 }}>
                             Invoice Details
                         </Typography>
