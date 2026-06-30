@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { Box, Typography, Stack, alpha } from '@mui/material'
 import { useAuth } from '@/context/AuthContext'
+
 const FEATURES = [
   'AI-powered business insights',
   'Invoice & sales management',
@@ -11,9 +12,8 @@ const FEATURES = [
 ]
 
 export default function AuthLayout() {
-   
-    const { isAuthenticated } = useAuth()
-    if (isAuthenticated()) return <Navigate to="/dashboard" replace />
+    const { isAuthenticated, isAdmin } = useAuth()
+    if (isAuthenticated()) return <Navigate to={isAdmin() ? '/admin' : '/dashboard'} replace />
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -61,16 +61,11 @@ export default function AuthLayout() {
 
                 {/* Tagline */}
                 <Box sx={{ mb: 5 }}>
-                    <Typography
-                        sx={{
-                            fontFamily: '"Fraunces", serif',
-                            fontSize: 'clamp(32px, 4vw, 52px)',
-                            fontWeight: 700,
-                            color: '#fff',
-                            lineHeight: 1.15,
-                            mb: 2,
-                        }}
-                    >
+                    <Typography sx={{
+                        fontFamily: '"Fraunces", serif',
+                        fontSize: 'clamp(32px, 4vw, 52px)',
+                        fontWeight: 700, color: '#fff', lineHeight: 1.15, mb: 2,
+                    }}>
                         Run your business,<br />
                         <Box component="span" sx={{ color: '#4B73E0' }}>smarter.</Box>
                     </Typography>

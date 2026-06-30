@@ -10,6 +10,7 @@ export function BusinessProvider({ children }) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+
     if (isAuthenticated() && user?.businessId) fetchBusiness(user.businessId)
   }, [user])
 
