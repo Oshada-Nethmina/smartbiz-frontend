@@ -15,29 +15,46 @@ const Row = ({ label, value }) => (
     </Box>
 )
 
-export default function CustomerDetail() {
-    const { id } = useParams()
+export default function CustomerDetail({ customerId, onClose, onEdit }) {
+    const { id: paramId } = useParams()
     const navigate = useNavigate()
+    const id = customerId || paramId
     const [customer, setCustomer] = useState(null)
 
+    const handleCancel = () => {
+        if (onClose) onClose()
+        else navigate('/customers')
+    }
+
+    const handleEdit = () => {
+        if (onEdit) onEdit(id)
+        else navigate(`/customers/${id}/edit`)
+    }
     useEffect(() => {
-        customerService.getById(id).then(r => setCustomer(r.data)).catch(() => navigate('/customers'))
-    }, [id])
+        if (!id) return;
+
+        customerService
+            .getById(id)
+            .then(r => setCustomer(r.data))
+            .catch(handleCancel);
+    }, [id]);
 
     if (!customer) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}><CircularProgress /></Box>
 
     return (
         <Box sx={{ maxWidth: 560 }}>
-            <PageHeader
-                title={customer.name}
-                subtitle="Customer Profile"
-                action={
-                    <Stack direction="row" spacing={1}>
-                        <Button startIcon={<ArrowBack />} onClick={() => navigate('/customers')}>Back</Button>
-                        <Button variant="contained" startIcon={<Edit />} onClick={() => navigate(`/customers/${id}/edit`)}>Edit</Button>
-                    </Stack>
-                }
-            />
+            {!onClose && (
+                <PageHeader
+                    title={customer.name}
+                    subtitle="Customer Profile"
+                    action={
+                        <Stack direction="row" spacing={1}>
+                            <Button startIcon={<ArrowBack />} onClick={handleCancel}>Back</Button>
+                            <Button variant="contained" startIcon={<Edit />} onClick={handleEdit}>Edit</Button>
+                        </Stack>
+                    }
+                />
+            )}
             <SectionCard>
                 <Row label="Full Name" value={customer.name} />
                 <Row label="Email" value={customer.email} />

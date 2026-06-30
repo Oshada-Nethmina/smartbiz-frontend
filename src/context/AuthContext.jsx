@@ -3,27 +3,51 @@ import { authService } from '@/services'
 
 const AuthContext = createContext(null)
 
+function parseAuthResponse(data) {
+  const token = data?.token;
+
+  // Support multiple backend response formats
+  const rawUser =
+    data?.userResponse ||
+    data?.user ||
+    data;
+
+  const role = (rawUser?.role || rawUser?.userRole || rawUser?.type || 'USER')
+    .toString()
+    .toUpperCase();
+
+  return {
+    token,
+    user: {
+      ...rawUser,
+      role,
+    },
+  };
+}
+
+
+// ──────────────────────────────────────────────────────────────────────────
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // ✅ FIXED: safe localStorage parsing
+  // Restore session from localStorage on mount
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem('sb_user')
       const storedToken = localStorage.getItem('sb_token')
 
-      if (
-        storedUser &&
-        storedUser !== "undefined" &&
-        storedToken
-      ) {
-        setUser(JSON.parse(storedUser))
+      if (storedUser && storedUser !== 'undefined' && storedToken) {
+        const parsed = JSON.parse(storedUser)
+        // Re-normalize role in case old data was stored without normalization
+        parsed.role = (parsed.role || 'USER').toString().toUpperCase()
+        setUser(parsed)
       } else {
         setUser(null)
       }
     } catch (err) {
-      console.error("Auth parse error:", err)
+      console.error('Auth restore error:', err)
+      localStorage.removeItem('sb_token')
       localStorage.removeItem('sb_user')
       setUser(null)
     }
@@ -31,39 +55,26 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }, [])
 
-  // ✅ FIXED: trim inputs
   const login = async (email, password) => {
     const res = await authService.login(email, password)
 
-    console.log("API RESPONSE:", res.data)
+    const { token, user } = parseAuthResponse(res.data)
 
-    const token = res.data.token
-
-    // ✅ handle both structures
-    const user = res.data.user || res.data
-
-    if (!token || !user) {
-      throw new Error("Invalid server response")
+    if (!token || !user?.role) {
+      throw new Error('Invalid authentication response')
     }
 
     localStorage.setItem('sb_token', token)
     localStorage.setItem('sb_user', JSON.stringify(user))
 
     setUser(user)
-    return user
+    return user;
   }
 
   const register = async (data) => {
-    const res = await authService.register(data)
-
-    const { token, user: u } = res.data
-
-    localStorage.setItem('sb_token', token)
-    localStorage.setItem('sb_user', JSON.stringify(u))
-
-    setUser(u)
-    return u
-  }
+    await authService.register(data);
+    return true;
+  };
 
   const logout = () => {
     localStorage.removeItem('sb_token')
@@ -71,8 +82,10 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const isAdmin = () => user?.role === 'ADMIN'
+  // Case-insensitive admin check — works with 'ADMIN', 'admin', 'Admin'
+  const isAdmin = () => user?.role?.toUpperCase() === 'ADMIN'
   const isAuthenticated = () => !!user
+
 
   return (
     <AuthContext.Provider

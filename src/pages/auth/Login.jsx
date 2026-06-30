@@ -21,24 +21,22 @@ export default function Login() {
         e.preventDefault()
         setError('')
         setLoading(true)
-
         try {
             const user = await login(form.email, form.password)
 
-            console.log("LOGIN SUCCESS:", user) // ✅ debug
+            console.log("Logged in user:", user);
 
-            // ✅ navigate after success
-            navigate(user?.role === 'ADMIN' ? '/admin' : '/dashboard')
-
+            if (user.role?.toUpperCase() === 'ADMIN') {
+                navigate('/admin/dashboard', { replace: true })
+            } else {
+                navigate('/dashboard', { replace: true })
+            }
         } catch (err) {
-            console.log("LOGIN ERROR:", err)
-
             const msg =
                 err.response?.data?.message ||
                 err.response?.data ||
                 err.message ||
-                "Login failed"
-
+                'Login failed'
             setError(msg)
         } finally {
             setLoading(false)

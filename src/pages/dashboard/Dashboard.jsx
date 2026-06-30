@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Grid, Paper, Box, Typography, Stack, Chip, Button, Divider, alpha } from '@mui/material'
 import { ArrowForward, Warning } from '@mui/icons-material'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { salesService, expenseService, productService, customerService } from '@/services'
+import { salesService, financeService, productService, customerService } from '@/services'
 import { useBusiness } from '@/context/BusinessContext'
 import { StatCard, SectionCard } from '@/components/common/UI'
 
@@ -46,7 +46,7 @@ export default function Dashboard() {
         const id = business.id
         Promise.allSettled([
             salesService.getSummary(id, 'monthly'),
-            expenseService.getSummary(id, 'monthly'),
+            financeService.getSummary(id, 'monthly'),
             customerService.getAll(id),
             productService.getLowStock(id),
         ]).then(([salesR, expR, custR, stockR]) => {
@@ -77,7 +77,7 @@ export default function Dashboard() {
                     { title: 'Net Profit', value: fmt(stats?.netProfit), icon: '📈', color: 'success' },
                     { title: 'Total Customers', value: stats?.totalCustomers ?? '—', icon: '👥', color: 'secondary' },
                 ].map((s) => (
-                    <Grid item xs={12} sm={6} xl={3} key={s.title}>
+                    <Grid size={{ xs: 12, sm: 6, xl: 3 }} key={s.title}>
                         <StatCard {...s} />
                     </Grid>
                 ))}
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
             {/* ── Charts ─────────────────────────────────── */}
             <Grid container spacing={2.5} sx={{ mb: 3 }}>
-                <Grid item xs={12} lg={8}>
+                <Grid size={{ xs: 12, lg: 8 }}>
                     <SectionCard title="Revenue Overview" action={
                         <Chip label="Last 6 months" size="small" variant="outlined" sx={{ fontWeight: 600 }} />
                     }>
@@ -107,7 +107,7 @@ export default function Dashboard() {
                     </SectionCard>
                 </Grid>
 
-                <Grid item xs={12} lg={4}>
+                <Grid size={{ xs: 12, lg: 4 }}>
                     <SectionCard title="Monthly Expenses">
                         <ResponsiveContainer width="100%" height={230}>
                             <BarChart data={chartData}>
@@ -125,7 +125,7 @@ export default function Dashboard() {
             {/* ── Bottom ─────────────────────────────────── */}
             <Grid container spacing={2.5}>
                 {/* Recent Sales */}
-                <Grid item xs={12} lg={7}>
+                <Grid size={{ xs: 12, lg: 7 }}>
                     <SectionCard
                         title="Recent Sales"
                         action={
@@ -155,7 +155,7 @@ export default function Dashboard() {
                 </Grid>
 
                 {/* Low Stock */}
-                <Grid item xs={12} lg={5}>
+                <Grid size={{ xs: 12, lg: 5 }}>
                     <SectionCard
                         title={<Stack direction="row" spacing={1} alignItems="center"><Warning sx={{ color: 'warning.main', fontSize: 18 }} /><span>Low Stock Alerts</span></Stack>}
                     >

@@ -14,7 +14,7 @@ import toast from 'react-hot-toast'
 
 const emptyItem = { productId: '', quantity: 1, price: 0, subtotal: 0 }
 
-export default function SalesForm() {
+export default function SalesForm({ onClose, onSuccess }) {
     const navigate = useNavigate()
     const { business } = useBusiness()
     const { user } = useAuth()
@@ -69,16 +69,30 @@ export default function SalesForm() {
             }
             await salesService.create(payload)
             toast.success('Sale created successfully!')
-            navigate('/sales')
+            if (onSuccess) {
+                onSuccess()
+            } else {
+                navigate('/sales')
+            }
         } finally { setLoading(false) }
+    }
+
+    const handleCancel = () => {
+        if (onClose) {
+            onClose()
+        } else {
+            navigate('/sales')
+        }
     }
 
     return (
         <Box sx={{ maxWidth: 860 }}>
-            <PageHeader
-                title="New Sale"
-                action={<Button startIcon={<ArrowBack />} onClick={() => navigate('/sales')}>Back</Button>}
-            />
+            {!onClose && (
+                <PageHeader
+                    title="New Sale"
+                    action={<Button startIcon={<ArrowBack />} onClick={handleCancel}>Back</Button>}
+                />
+            )}
 
             <Box component="form" onSubmit={handleSubmit}>
                 <Stack spacing={2.5}>
@@ -86,20 +100,20 @@ export default function SalesForm() {
                     {/* ── Sale Info ─────────────────────────── */}
                     <SectionCard title="Sale Details">
                         <Grid container spacing={2.5}>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <TextField select label="Customer" name="customerId" value={form.customerId}
                                     onChange={e => setForm({ ...form, customerId: e.target.value })} fullWidth>
                                     <MenuItem value="">Walk-in Customer</MenuItem>
                                     {customers.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
                                 </TextField>
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <TextField select label="Payment Method" name="paymentMethod" value={form.paymentMethod}
                                     onChange={e => setForm({ ...form, paymentMethod: e.target.value })} fullWidth>
                                     {['CASH', 'CARD', 'BANK_TRANSFER', 'ONLINE'].map(m => <MenuItem key={m} value={m}>{m.replace('_', ' ')}</MenuItem>)}
                                 </TextField>
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <TextField label="Sale Date" name="salesDate" type="date" value={form.salesDate}
                                     onChange={e => setForm({ ...form, salesDate: e.target.value })} fullWidth InputLabelProps={{ shrink: true }} />
                             </Grid>
@@ -170,7 +184,7 @@ export default function SalesForm() {
                             disabled={loading}>
                             Create Sale & Invoice
                         </Button>
-                        <Button variant="outlined" size="large" onClick={() => navigate('/sales')}>Cancel</Button>
+                        <Button variant="outlined" size="large" onClick={handleCancel}>Cancel</Button>
                     </Stack>
                 </Stack>
             </Box>
